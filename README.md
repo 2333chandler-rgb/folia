@@ -135,7 +135,8 @@ https://github.com/user-attachments/assets/704f195a-2194-434b-86e8-8f36290e5cc4
 
 如果你希望快速上线 Web 版本，请阅读 [Vercel 一键部署指南](https://folia-site.cielaniska.top/guide/deploy-vercel) 来创建项目
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/chthollyphile/folia-major) 
+[![Deploy with Vercel]
+(https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/chthollyphile/folia-major) 
 
 项目也支持一键部署到 Cloudflare，请参考 Vercel 的部署教程进行相应调整。
 
@@ -245,3 +246,4 @@ Folia 会读取音频文件元数据、同目录歌词和封面，并可通过�
 ## 许可证
 
 本项目基于 `AGPL-3.0` 许可证开源。
+本站部署于 Vercel，音乐源：网易云 API + 酷狗 API。
