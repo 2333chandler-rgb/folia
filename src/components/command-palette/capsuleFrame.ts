@@ -14,7 +14,7 @@ const PANEL_CHROME_PX = 160;
 const OPEN_RADIUS_PX = 24;
 
 /** 从胶囊展开、收回胶囊各用多久（秒）。 */
-export const CAPSULE_MORPH_DURATION_S = 0.28;
+export const CAPSULE_MORPH_DURATION_S = 0.6;
 /**
  * 收起时多久把外壳交还给胶囊（毫秒）：比收回动画略早，胶囊在面板最后那点淡出里接上，
  * 两者在同一个位置交叉一下，而不是面板先没了、胶囊再冒出来，或者两个一起缩放。
