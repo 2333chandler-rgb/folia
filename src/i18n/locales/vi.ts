@@ -701,6 +701,7 @@ export default {
       "lyric-staff-absorb-cycle": { "title": "Chế độ gộp thông tin sản xuất (Credits)", "description": "Chuyển đổi việc gộp các dòng lân cận vào khối thông tin sản xuất (Credits)" },
       "settings-obs-browser-source": { "title": "Nguồn trình duyệt OBS", "description": "Mở cài đặt nguồn trình duyệt OBS" },
       "obs-toggle-keep-main-window-animation": { "title": "OBS: giữ hiệu ứng động cửa sổ chính", "description": "Bật/tắt giữ hiệu ứng động ở cửa sổ chính khi kết nối OBS" },
+      "obs-toggle-track-card": { "title": "OBS: hiện thẻ bài đang phát", "description": "Bật/tắt vẽ thẻ bài đang phát trong nguồn trình duyệt OBS" },
       "desktop-toggle-lyric-api": { "title": "API lời bài hát", "description": "Bật/tắt endpoint lời bài hát nội bộ không cần xác thực" },
       "settings-obs-copy-css": { "title": "Sao chép CSS OBS", "description": "Sao chép CSS tùy chỉnh nguồn OBS kèm tài nguyên đã tải lên" },
       "settings-storage": { "title": "Cài đặt lưu trữ", "description": "Mở cài đặt bộ nhớ đệm và lưu trữ" },
@@ -1520,7 +1521,11 @@ export default {
     "noteDeviceLimit": "Vui lòng đăng xuất khỏi các thiết bị không dùng trên điện thoại rồi thử lại",
     "noteWrongScanApp": "Vui lòng quét bằng ứng dụng tương ứng với phương thức đăng nhập này, hoặc chọn phương thức khác",
     "noteCloseBrowser": "Vui lòng đóng trình duyệt đó rồi thử lại",
-    "noteUnknown": "Lỗi không xác định"
+    "noteUnknown": "Lỗi không xác định",
+    "submit": "Gửi",
+    "submitting": "Đang gửi…",
+    "formErrorUnknown": "Đăng nhập thất bại. Kiểm tra thông tin đã nhập và thử lại.",
+    "formLoggedInRefreshFailed": "Đã đăng nhập nhưng không tải được tài khoản. Thử lại hoặc mở lại cửa sổ đăng nhập.",
   },
   "failure": {
     "unreachable": "Không thể kết nối tới {{provider}}",
@@ -1582,6 +1587,8 @@ export default {
     "loginNoteQishui": "Quét mã bằng ứng dụng Douyin và xác nhận ủy quyền",
     "loginTitleBodian": "Quét bằng Bodian Music",
     "loginNoteBodian": "Mở ứng dụng Bodian Music quét mã QR và xác nhận đăng nhập",
+    "loginTitleFnMusic": "Đăng nhập fnOS Music",
+    "loginNoteFnMusic": "Nhập địa chỉ máy chủ và tài khoản fnOS Music để phát nhạc từ NAS của bạn",
     "loginTitleYtm": "Đăng nhập YouTube Music",
     "loginNoteYtmBrowser": "Một cửa sổ trình duyệt riêng sẽ mở ra. Đăng nhập vào Google tại đó, sau khi thấy YouTube Music hiển thị tài khoản của bạn, hãy đóng cửa sổ đó.",
     "loginNoteYtmBrowserMac": "Một cửa sổ trình duyệt riêng sẽ mở ra. Đăng nhập vào Google tại đó, sau khi thấy YouTube Music hiển thị tài khoản của bạn, hãy thoát trình duyệt (⌘Q).",
@@ -1836,6 +1843,13 @@ export default {
     "version": "phiên bản"
   },
   "qishui": { "recentPlayed": "Gần đây đã phát trên Qishui", "recommended": "Được đề xuất cho bạn" },
+  "listeningRank": {
+    "week": "Xếp hạng nghe · Tuần qua",
+    "all": "Xếp hạng nghe · Mọi lúc",
+    "description": "Bài hát xếp theo lịch sử nghe của tài khoản này trên nền tảng",
+    "listenCount_one": "Đã nghe {{count}} lần",
+    "listenCount_other": "Đã nghe {{count}} lần"
+  },
   "lyricProvider": {
     "qishui": "Qishui Music",
     "netease": "NetEase Cloud Music",
@@ -1852,6 +1866,7 @@ export default {
     "ytm": "YT Music",
     "spotify": "Spotify",
     "qishui": "Qishui",
+    "fnmusic": "fnOS",
   },
   "globalLyricOffset": {
     "title": "Độ lệch thời gian toàn cục",
@@ -2455,6 +2470,8 @@ export default {
     "stageTrackPillMode_never": "Không hiển thị",
     "stageTrackPillOnHome": "Hiện cả ở trang chủ",
     "stageTrackPillOnHomeDesc": "Tắt sẽ giữ thẻ ở trình phát và hàng đợi. Bật sẽ hiện thêm ở trang chủ, gồm sau khi mở app hoặc đổi bài.",
+    "stageTrackPillInObs": "Hiện trong nguồn trình duyệt",
+    "stageTrackPillInObsDesc": "Bật để vẽ thẻ cả trong nguồn trình duyệt của OBS, theo cách hiển thị, thời lượng và vị trí ở trên. Trên bản web, hãy sao chép lại liên kết OBS để áp dụng.",
     "stageTrackPillTimeout": "Thời gian hiển thị",
     "disableVisualizerVignette": "Tắt làm tối góc",
     "visualizerVignette": "Làm tối bốn góc",
@@ -4454,6 +4471,19 @@ export default {
     "cloudDrive": "Ổ đĩa đám mây",
     "cloudDriveDesc": "Ổ đĩa NetEase Cloud Music",
     "qqCloudDriveDesc": "Ổ nhạc đám mây Weiyun",
+  },
+  "fnmusic": {
+    "serverUrl": "Địa chỉ máy chủ",
+    "serverUrlPlaceholder": "vd: http://192.168.1.10:5666",
+    "username": "Tài khoản",
+    "usernamePlaceholder": "Tài khoản fnOS Music hoặc tài khoản NAS",
+    "password": "Mật khẩu",
+    "login": "Đăng nhập",
+    "loginNote": "Nhập địa chỉ máy chủ, tài khoản và mật khẩu fnOS Music",
+    "errorBadCredentials": "Sai tài khoản hoặc mật khẩu",
+    "errorNetwork": "Không thể kết nối máy chủ. Kiểm tra địa chỉ và kết nối của bạn.",
+    "errorBadResponse": "Máy chủ trả về phản hồi không nhận dạng được",
+    "errorBadServerUrl": "Địa chỉ máy chủ không hợp lệ, ví dụ: http://192.168.1.10:5666"
   },
   "hifi": {
     "settings": {

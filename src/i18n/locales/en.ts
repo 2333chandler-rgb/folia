@@ -701,6 +701,7 @@ export default {
       "lyric-staff-absorb-cycle": { "title": "Opening credits absorb mode", "description": "Cycle whether neighbouring lines are folded into the credit block" },
       "settings-obs-browser-source": { "title": "OBS browser source", "description": "Open OBS browser source settings" },
       "obs-toggle-keep-main-window-animation": { "title": "OBS: keep main window animation", "description": "Toggle whether the main window keeps its animation while OBS is connected" },
+      "obs-toggle-track-card": { "title": "OBS: show the now playing card", "description": "Toggle whether the now playing card is drawn in the OBS browser source" },
       "desktop-toggle-lyric-api": { "title": "Lyrics API", "description": "Toggle the local unauthenticated lyrics endpoint" },
       "settings-obs-copy-css": { "title": "Copy OBS CSS", "description": "Copy the OBS Browser Source Custom CSS carrying uploaded assets" },
       "settings-storage": { "title": "Storage settings", "description": "Open cache and storage settings" },
@@ -1520,7 +1521,11 @@ export default {
     "noteDeviceLimit": "Sign out of a device you no longer use on your phone, then try again",
     "noteWrongScanApp": "Scan with the app this sign-in method is for, or choose another method",
     "noteCloseBrowser": "Close that browser, then try again",
-    "noteUnknown": "Unknown error"
+    "noteUnknown": "Unknown error",
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "formErrorUnknown": "Sign-in failed. Check what you entered and try again.",
+    "formLoggedInRefreshFailed": "Signed in, but couldn't load your account. Try again or reopen the login window.",
   },
   "failure": {
     "unreachable": "Cannot connect to {{provider}}",
@@ -1582,6 +1587,8 @@ export default {
     "loginNoteQishui": "Scan with the Douyin app and confirm authorization",
     "loginTitleBodian": "Scan with Bodian Music",
     "loginNoteBodian": "Scan this code with the Bodian Music app and confirm sign-in",
+    "loginTitleFnMusic": "Sign in to fnOS Music",
+    "loginNoteFnMusic": "Enter your fnOS Music server address and account to play your NAS music library",
     "loginTitleYtm": "Sign in to YouTube Music",
     "loginNoteYtmBrowser": "A separate browser window opens. Sign in to Google there, and close that window once YouTube Music shows your account.",
     "loginNoteYtmBrowserMac": "A separate browser window opens. Sign in to Google there, and quit that browser (⌘Q) once YouTube Music shows your account.",
@@ -1836,6 +1843,13 @@ export default {
     "version": "Version"
   },
   "qishui": { "recentPlayed": "Recently played on Qishui", "recommended": "Recommended for you" },
+  "listeningRank": {
+    "week": "Listening ranking · Last week",
+    "all": "Listening ranking · All time",
+    "description": "Songs ranked by this account's listening on the platform",
+    "listenCount_one": "Played {{count}} time",
+    "listenCount_other": "Played {{count}} times"
+  },
   "lyricProvider": {
     "qishui": "Qishui Music",
     "netease": "NetEase Cloud Music",
@@ -1852,6 +1866,7 @@ export default {
     "ytm": "YT Music",
     "spotify": "Spotify",
     "qishui": "Qishui",
+    "fnmusic": "fnOS",
   },
   "globalLyricOffset": {
     "title": "Global Timing Offset",
@@ -2455,6 +2470,8 @@ export default {
     "stageTrackPillMode_never": "Never show",
     "stageTrackPillOnHome": "Show on the home page too",
     "stageTrackPillOnHomeDesc": "Off keeps the card on the player and play queue. On also shows it on home, including after launch or a track change there.",
+    "stageTrackPillInObs": "Show in the browser source",
+    "stageTrackPillInObsDesc": "On also draws the card in the OBS browser source, with the display mode, duration and position above. On the web, copy the OBS link again for it to apply.",
     "stageTrackPillTimeout": "Visible duration",
     "disableVisualizerVignette": "Disable vignette",
     "visualizerVignette": "Vignette",
@@ -4454,6 +4471,19 @@ export default {
     "cloudDrive": "Cloud Drive",
     "cloudDriveDesc": "NetEase Cloud Music Drive",
     "qqCloudDriveDesc": "Weiyun Music Drive",
+  },
+  "fnmusic": {
+    "serverUrl": "Server address",
+    "serverUrlPlaceholder": "e.g. http://192.168.1.10:5666",
+    "username": "Account",
+    "usernamePlaceholder": "fnOS Music account or NAS account",
+    "password": "Password",
+    "login": "Log in",
+    "loginNote": "Enter your fnOS Music server address, account and password",
+    "errorBadCredentials": "Account or password is wrong",
+    "errorNetwork": "Cannot reach the server. Check the address and your connection.",
+    "errorBadResponse": "The server returned an unexpected response",
+    "errorBadServerUrl": "The server address is not valid, e.g. http://192.168.1.10:5666"
   },
   "hifi": {
     "settings": {

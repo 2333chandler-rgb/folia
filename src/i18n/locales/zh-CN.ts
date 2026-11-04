@@ -701,6 +701,7 @@ export default {
       "lyric-staff-absorb-cycle": { "title": "开头制作人员信息：吸收相邻行", "description": "轮换署名块是否把相邻的短耗行一起并入" },
       "settings-obs-browser-source": { "title": "OBS 浏览器源", "description": "打开 OBS 浏览器源设置" },
       "obs-toggle-keep-main-window-animation": { "title": "OBS 连接时保持主窗口动画", "description": "切换 OBS 连接时主窗口是否继续渲染歌词动画" },
+      "obs-toggle-track-card": { "title": "OBS 浏览器源显示歌曲信息卡片", "description": "切换 OBS 浏览器源里是否也画歌曲信息卡片" },
       "desktop-toggle-lyric-api": { "title": "歌词接口", "description": "切换本地免鉴权歌词接口" },
       "settings-obs-copy-css": { "title": "复制 OBS CSS", "description": "复制 OBS 浏览器源的自定义 CSS，把上传的背景/立绘等资产带到 OBS" },
       "settings-storage": { "title": "存储设置", "description": "打开缓存和存储设置" },
@@ -1520,7 +1521,11 @@ export default {
     "noteDeviceLimit": "请在手机上退出不用的设备后重试",
     "noteWrongScanApp": "请用这种登录方式对应的 App 扫码，或改选别的登录方式",
     "noteCloseBrowser": "请关闭该浏览器后重试",
-    "noteUnknown": "未知错误"
+    "noteUnknown": "未知错误",
+    "submit": "提交",
+    "submitting": "提交中…",
+    "formErrorUnknown": "登录失败，请检查填写内容后重试",
+    "formLoggedInRefreshFailed": "登录成功，但读取账号失败。请重试或重新打开登录窗口。",
   },
   "failure": {
     "unreachable": "无法连接{{provider}}",
@@ -1582,6 +1587,8 @@ export default {
     "loginNoteQishui": "请使用抖音 App 扫码并确认授权",
     "loginTitleBodian": "使用波点音乐 App 扫码",
     "loginNoteBodian": "打开波点音乐 App 扫描二维码并确认登录",
+    "loginTitleFnMusic": "登录飞牛音乐",
+    "loginNoteFnMusic": "填入你的飞牛音乐服务器地址与账号，畅听 NAS 私有音乐库",
     "loginTitleYtm": "登录 YouTube Music",
     "loginNoteYtmBrowser": "会打开一个单独的浏览器窗口。在里面登录 Google，看到 YouTube Music 显示你的账号后，关掉那个窗口。",
     "loginNoteYtmBrowserMac": "会打开一个单独的浏览器窗口。在里面登录 Google，看到 YouTube Music 显示你的账号后，退出那个浏览器（⌘Q）。",
@@ -1836,6 +1843,13 @@ export default {
     "version": "版本"
   },
   "qishui": { "recentPlayed": "汽水最近播放", "recommended": "为你推荐" },
+  "listeningRank": {
+    "week": "听歌排行 · 最近一周",
+    "all": "听歌排行 · 所有时间",
+    "description": "按这个账号在平台上的收听记录排出的歌",
+    "listenCount_one": "听过 {{count}} 次",
+    "listenCount_other": "听过 {{count}} 次"
+  },
   "lyricProvider": {
     "qishui": "汽水音乐",
     "netease": "网易云音乐",
@@ -1852,6 +1866,7 @@ export default {
     "ytm": "YT Music",
     "spotify": "Spotify",
     "qishui": "汽水",
+    "fnmusic": "飞牛",
   },
   "globalLyricOffset": {
     "title": "全局时间偏移",
@@ -2455,6 +2470,8 @@ export default {
     "stageTrackPillMode_never": "不显示",
     "stageTrackPillOnHome": "在首页显示",
     "stageTrackPillOnHomeDesc": "关闭时仍在播放器和播放队列显示；开启后也会在首页显示。",
+    "stageTrackPillInObs": "在浏览器源中启用",
+    "stageTrackPillInObsDesc": "开启后，OBS 浏览器源里也画这张卡片，按上面的显示方式、时长和位置。网页版要重新复制 OBS 链接才生效。",
     "stageTrackPillTimeout": "显示时长",
     "disableVisualizerVignette": "禁用暗角",
     "visualizerVignette": "暗角",
@@ -4454,6 +4471,19 @@ export default {
     "cloudDrive": "云盘",
     "cloudDriveDesc": "网易云音乐云盘",
     "qqCloudDriveDesc": "微云音乐网盘",
+  },
+  "fnmusic": {
+    "serverUrl": "服务器地址",
+    "serverUrlPlaceholder": "例如: http://192.168.1.10:5666",
+    "username": "账号",
+    "usernamePlaceholder": "飞牛音乐账号或 NAS 账号",
+    "password": "密码",
+    "login": "登录",
+    "loginNote": "输入你的飞牛（fnOS）音乐服务器地址与账号密码",
+    "errorBadCredentials": "账号或密码错误",
+    "errorNetwork": "无法连接服务器，请检查地址与网络",
+    "errorBadResponse": "服务器返回了无法识别的响应",
+    "errorBadServerUrl": "服务器地址无效，例如：http://192.168.1.10:5666"
   },
   "hifi": {
     "settings": {
