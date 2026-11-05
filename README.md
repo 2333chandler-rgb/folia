@@ -254,4 +254,5 @@ Folia 会读取音频文件元数据、同目录歌词和封面，并可通过�
 - 练习 Squash 合并完成。
 - 练习 Squash 第二轮完成。
 - 练习 Draft PR。
-- 练习 Rebase。
+- 练习 Rebase 合并。
+
