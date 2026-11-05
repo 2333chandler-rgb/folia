@@ -256,4 +256,4 @@ Folia 会读取音频文件元数据、同目录歌词和封面，并可通过�
 - 练习 Draft PR。
 - 练习 Rebase 合并完成。
 - 练习分支保护。
-- 练习 Code Review。
+- 练习 Code Review 建议。
