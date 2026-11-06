@@ -147,7 +147,7 @@ export type VisualizerFrameRate = 'off' | 120 | 90 | 60;
 export type LyricRenderScale = 0.5 | 0.75 | 1 | 1.5 | 2;
 /** 歌词画布的抗锯齿：auto 是各样式自己的默认（有的开 MSAA，有的靠后处理）。 */
 export type LyricAntialias = 'auto' | 'on' | 'off';
-/** 「性能与动效」里的全局挡位：各样式默认跟随它。 */
+/** 「动画与性能」里的全局挡位：各样式默认跟随它。 */
 export interface LyricRenderQuality {
   scale: LyricRenderScale;
   antialias: LyricAntialias;
@@ -227,12 +227,32 @@ export type StageLyricSource =
   | StageNavidromeLyricSource
   | StageQrcLyricSource;
 
+/** Where an external player is, as last reported to the Stage API (POST /stage/lyrics or /stage/lyrics/clock). */
+export interface StageLyricsClock {
+  positionMs: number;
+  paused: boolean;
+  /** The main process's Date.now() when the position was received; the clock runs on from it. */
+  sampledAtMs: number;
+}
+
 export interface StageLyricsSession {
   title?: string;
   artist?: string;
   album?: string;
-  lyricSource: StageLyricSource;
+  /** Absent for a session that only shows a track (its lyrics not found, or not here yet). */
+  lyricSource?: StageLyricSource;
+  durationMs?: number;
+  coverUrl?: string;
+  /** Present when an external player drives the session's time. */
+  clock?: StageLyricsClock;
   updatedAt: number;
+}
+
+/** What POST /stage/lyrics/clock sends to the window: the clock of the session with that `updatedAt`. */
+export interface StageLyricsClockUpdate {
+  sessionUpdatedAt: number;
+  clock: StageLyricsClock;
+  durationMs?: number;
 }
 
 export interface StageMediaSession {
@@ -464,7 +484,7 @@ export const DEFAULT_CLASSIC_TUNING: ClassicTuning = {
 };
 
 export interface CadenzaTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   fontScale: number;
   widthRatio: number;
@@ -500,7 +520,7 @@ export const DEFAULT_PARTITA_TUNING: PartitaTuning = {
 };
 
 export interface FumeTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   hidePrintSymbols: boolean;
   disableGeometricBackground: boolean;
@@ -570,7 +590,7 @@ export const DEFAULT_TILT_TUNING: TiltTuning = {
 };
 
 export interface PendoloTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   arcRadius: number;
   arcAngleDeg: number;
@@ -601,7 +621,7 @@ export const DEFAULT_PENDOLO_TUNING: PendoloTuning = {
 export type SonnetOuterFrameMode = 'none' | 'frame' | 'full';
 
 export interface SonnetTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   cameraIntensity: number;
   typographyMotion: number;
@@ -739,7 +759,7 @@ export const DEFAULT_TEMPERA_LAYER_IMAGE: Omit<TemperaLayerImage, 'id' | 'name'>
 };
 
 export interface TemperaTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   cameraIntensity: number;
   /** Per-glyph entrance motion strength, 0..2. */
@@ -833,7 +853,7 @@ export const DEFAULT_TEMPERA_TUNING: TemperaTuning = {
 export type LumiereRenderQuality = 'full' | 'balanced' | 'low';
 
 export interface LumiereTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   /** 光强倍率, 0.3..2. */
   lightIntensity: number;
@@ -979,7 +999,7 @@ export const DIORAMA_PARTICLE_GLOW_INTENSITY_MAX = 1.5;
 export const DIORAMA_PARTICLE_GLOW_INTENSITY_STEP = 0.05;
 
 export interface DioramaTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   cameraSpeed: number;
   motionAmount: number;
@@ -1127,7 +1147,7 @@ export interface SoraBackgroundTuning {
 }
 
 export interface MonetTuning {
-  /** 分辨率与抗锯齿（#929）：默认跟随「性能与动效」里的全局挡位（utils/lyricRenderQuality.ts）。 */
+  /** 分辨率与抗锯齿（#929）：默认跟随「动画与性能」里的全局挡位（utils/lyricRenderQuality.ts）。 */
   render: LyricRenderOverride;
   keywordColoringEnabled: boolean;
   showDescription: boolean;

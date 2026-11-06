@@ -1,4 +1,4 @@
-import type { PersonalFmCatalog, PersonalFmSelection } from './personalFm';
+import type { PersonalFmCatalog, PersonalFmLaunch } from './personalFm';
 import type { LyricData, ReplayGainInfo, SongResult, UnifiedSong } from '../types';
 
 // src/types/onlineMusic.ts
@@ -71,6 +71,12 @@ export interface ProviderCapabilities {
     historyRecommendations?: boolean;
     /** Daily recommendations can be narrowed to styles the account picks (`recommendations.getDailyStyle*`). */
     dailyStyleRecommendations?: boolean;
+    /**
+     * The account keeps preferences that steer what the provider recommends, read and saved through
+     * `recommendations.getRecommendationPreferences` / `saveRecommendationPreferences`; where the app
+     * offers them is `recommendations.preferenceEntries`.
+     */
+    recommendationPreferences?: boolean;
     playlistSubscription?: boolean;
     playlistTrackMutations?: boolean;
     likes?: boolean;
@@ -79,6 +85,11 @@ export interface ProviderCapabilities {
     playbackReports?: boolean;
     /** The provider has a recommendation page of its own, read through `explore`. */
     explore?: boolean;
+    /**
+     * The provider sounds its songs in a player of its own outside this app. `externalPlayback`
+     * steers that player; `playback.getAudioSource` is not used.
+     */
+    externalPlayback?: boolean;
     /**
      * The provider can look a song up by id with `playback.getSongDetail`; absent reads as true
      * wherever `playback` is there.
@@ -89,6 +100,8 @@ export interface ProviderCapabilities {
 export interface ProviderAvailability {
     configured: boolean;
     reason?: 'not-configured' | 'runtime-unavailable';
+    /** Optional i18n key explaining a disabled platform row; kept provider-owned. */
+    messageKey?: string;
 }
 
 export interface ProviderAccountSummary {
@@ -214,13 +227,17 @@ export type ListeningRankRange = 'week' | 'all';
 
 export interface ProviderCollection {
     /** A provider's named radio stream: selecting the card starts FM with this mode. */
-    personalFm?: PersonalFmSelection;
+    personalFm?: PersonalFmLaunch;
     /** The account's listening ranking over this span (type `listening_rank`): read-only, made by the platform. */
     listeningRank?: ListeningRankRange;
     providerId: OnlineProviderId;
     id: MediaId;
     name: string;
-    type: 'playlist' | 'album' | 'artist' | 'radio' | 'cloud' | 'listening_rank' | string;
+    /**
+     * `artist_songs` is every song of the artist whose id this is (the artist page's "all songs", #918):
+     * a read-only list the app makes, read through `catalog.getArtistSongs`.
+     */
+    type: 'playlist' | 'album' | 'artist' | 'radio' | 'cloud' | 'listening_rank' | 'artist_songs' | string;
     coverUrl?: string;
     description?: string;
     trackCount?: number;
@@ -456,8 +473,63 @@ export interface OnlinePlaybackReportProvider {
     reportPlayback(song: SongResult, report: ProviderPlaybackReport): Promise<void>;
 }
 
+/**
+ * What an external player outside this app has loaded, as its provider says it.
+ * `mediaId` is the id the provider gave the player (not necessarily the song's `UnifiedSong.id`);
+ * `isStatusForSong` tells whether it is a given song.
+ */
+export interface ProviderExternalPlaybackStatus {
+    /** Live broadcasts have no seekable song timeline or natural track ending. */
+    live?: boolean;
+    mediaId: string;
+    isPlaying: boolean;
+    positionMs: number;
+    durationMs: number;
+    /** The player's own state says the track ran out. */
+    ended: boolean;
+    /** An intentional player-side seek, so small backward jumps must not be smoothed away. */
+    seeking?: boolean;
+    /** The player accepted a start/resume and is still buffering; this is not a user pause. */
+    starting?: boolean;
+}
+
+/**
+ * A player outside Folia that a provider steers: the provider's song plays there (inside a page
+ * this app cannot route as audio), and the app drives the transport and follows its clock.
+ * Only the song's own provider can answer these calls.
+ */
+export interface OnlineExternalPlaybackProvider {
+    /** False only for songs this external route already knows it cannot start; no network reads. */
+    canPlay?(song: SongResult): boolean;
+    /** Prepare a bounded successor queue without interrupting the current song. */
+    prepareNext?(song: SongResult, upcoming: SongResult[]): Promise<void>;
+    /** Whether a handoff can reuse an already prepared successor (not a guarantee of buffered audio). */
+    isPrepared?(song: SongResult): boolean;
+    /** Starts `song` in the player at `startSec`, replacing whatever it played; resolves once started. */
+    play(song: SongResult, startSec: number): Promise<void>;
+    pause(): Promise<void>;
+    resume(): Promise<void>;
+    seek(seconds: number): Promise<void>;
+    /** Sets the player's own output level (0 to 1, linear, 0 when muted): its audio never passes through the app's gain. */
+    setVolume?(volume: number): Promise<void>;
+    /** The player's state now, from no cache. */
+    getStatus(song: SongResult): Promise<ProviderExternalPlaybackStatus>;
+    /** Whether the player's loaded track is `song` (the id in `status` may be a playback id). */
+    isStatusForSong(song: SongResult, status: ProviderExternalPlaybackStatus): boolean;
+}
+
+/** An alternate title and artist that belong to the same song. */
+export interface ProviderLyricSearchAlias { song: SongResult; title: string; artist: string; album?: string }
+
 export interface OnlineLyricsProvider {
+    getSearchAlias?(song: SongResult): Promise<ProviderLyricSearchAlias | null>;
     getLyrics(song: SongResult, context?: { userId?: MediaId | null }): Promise<ProviderLyricsResult>;
+    /**
+     * Where its own lyrics are word-level, they are the timings to use even with automatic
+     * matching on: another source may have words too, but not this platform's own timing.
+     * Off where the platform leaves the choice to the automatic pick.
+     */
+    prefersOwnWordByWord?: boolean;
     getChorusRanges?(songId: MediaId): Promise<ChorusRange[]>;
     // 这首歌的歌手在别的平台上可能用的另一个名字；没有就返回 null。
     getAlternateArtistName?(song: SongResult): Promise<string | null>;
@@ -687,6 +759,8 @@ export interface ProviderLikedSongIds {
 }
 
 export interface OnlineLibraryProvider {
+    /** One favorite identity across catalog/library aliases; omitted when playback IDs already match. */
+    getSongLikeId?(song: SongResult): MediaId;
     getUserPlaylists(userId: MediaId, limit: number, offset: number): Promise<ProviderPage<ProviderCollection>>;
     /**
      * The id of every liked song. A page the adapter knows it could not read throws. An adapter
@@ -745,6 +819,8 @@ export interface OnlineCatalogProvider {
 export interface PersonalFmRequestOptions {
     mode?: string;
     submode?: string | null;
+    /** One of the provider's extra radios; absent for its Personal FM. A provider without stations ignores it. */
+    station?: string | null;
 }
 
 /**
@@ -769,20 +845,91 @@ export interface DailyStyleSongs {
     selection: DailyStyleSelection | null;
 }
 
+/**
+ * Words a provider shows with its recommendation preferences: `labelKey` is an i18n key for the
+ * user's language, `labelFallback` the provider's own words, shown when the key has no text.
+ */
+export interface RecommendationPreferenceLabel {
+    labelKey?: string;
+    labelFallback: string;
+}
+
+/** A preference picked from a few options (any number of them), each with the provider's own value. */
+export interface RecommendationPreferenceChoice {
+    kind: 'choice';
+    key: string;
+    label: RecommendationPreferenceLabel;
+    options: { value: string; label: RecommendationPreferenceLabel }[];
+    value: string;
+    defaultValue: string;
+}
+
+/**
+ * A preference on a scale from less to more, the default somewhere between. The numbers are the
+ * provider's; the app shows "less … default … more" and no number. `snapWithin`: a value this
+ * close to the default is taken for the default.
+ */
+export interface RecommendationPreferenceRatio {
+    kind: 'ratio';
+    key: string;
+    label: RecommendationPreferenceLabel;
+    min: number;
+    max: number;
+    defaultValue: number;
+    snapWithin?: number;
+    value: number;
+}
+
+/**
+ * One recommendation preference. Further kinds may come; the app passes over a kind it does not
+ * know, neither showing it nor sending it back.
+ */
+export type RecommendationPreferenceItem = RecommendationPreferenceChoice | RecommendationPreferenceRatio;
+
+/** The account's recommendation preferences, and a line on what they reach (the provider's words). */
+export interface RecommendationPreferences {
+    items: RecommendationPreferenceItem[];
+    note?: RecommendationPreferenceLabel;
+}
+
+/** What changed, by preference key: the option's value for a choice, the number for a ratio. */
+export type RecommendationPreferenceChanges = Record<string, string | number>;
+
+/** `confirmed` is false when the provider saved but read back something else, or could not read back. */
+export interface RecommendationPreferencesSaveResult {
+    confirmed: boolean;
+}
+
+/** Where the app offers the account's recommendation preferences. */
+export type RecommendationPreferenceEntry = 'explore' | 'personal-fm' | 'daily';
+
 export interface OnlineRecommendationProvider {
-    getPersonalFmCatalog?(): Promise<PersonalFmCatalog>;
+    /** The mode choices of the Personal FM, or of the extra radio `station` when one is asked for. */
+    getPersonalFmCatalog?(station?: string): Promise<PersonalFmCatalog>;
     getDailySongs?(refresh?: boolean): Promise<UnifiedSong[]>;
     getPersonalFm?(options?: PersonalFmRequestOptions): Promise<UnifiedSong[]>;
     getRecommendedCollections?(limit: number): Promise<ProviderCollection[]>;
     getHistoryEntries?(): Promise<ProviderHistoryEntry[]>;
     getHistoryDates?(): Promise<string[]>;
     getHistorySongs?(entry: ProviderHistoryEntry | string): Promise<UnifiedSong[]>;
-    dislikeSong?(id: MediaId): Promise<{ replacement?: UnifiedSong; limitReached?: boolean }>;
+    /** `removed`: the song was blacklisted with no replacement; the daily view drops the row. */
+    dislikeSong?(id: MediaId): Promise<{ replacement?: UnifiedSong; limitReached?: boolean; removed?: boolean }>;
     /** The style groups to pick from (capability `dailyStyleRecommendations`). */
     getDailyStyleGroups?(): Promise<DailyStyleGroup[]>;
     getDailyStyleSongs?(): Promise<DailyStyleSongs>;
     /** Saves the pick on the account; the next `getDailyStyleSongs` answers for it. */
     setDailyStyle?(selection: DailyStyleSelection): Promise<void>;
+    /**
+     * Where the app offers the account's recommendation preferences (capability
+     * `recommendationPreferences`); the command palette offers them wherever they are supported.
+     */
+    preferenceEntries?: readonly RecommendationPreferenceEntry[];
+    getRecommendationPreferences?(): Promise<RecommendationPreferences>;
+    /**
+     * Saves what changed and nothing else; the provider writes it the way its platform takes it
+     * (the whole set, or the changed fields alone).
+     */
+    saveRecommendationPreferences?(changes: RecommendationPreferenceChanges): Promise<RecommendationPreferencesSaveResult>;
 }
 
 /**
@@ -958,6 +1105,8 @@ export interface OnlineMusicProvider {
     getSongPageUrl?(song: SongResult): string | null;
     search?: OnlineSearchProvider;
     playback?: OnlinePlaybackProvider;
+    /** A player outside this app that sounds this provider's songs (see the capability of the same name). */
+    externalPlayback?: OnlineExternalPlaybackProvider;
     playbackReports?: OnlinePlaybackReportProvider;
     lyrics?: OnlineLyricsProvider;
     auth?: OnlineAuthProvider;
