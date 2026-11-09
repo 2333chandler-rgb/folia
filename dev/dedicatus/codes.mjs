@@ -75,10 +75,13 @@ export const CODES = {
     D440: { name: '高频回调里无条件写状态', level: 'error' },
     D441: { name: 'effect 里注册的东西没有 cleanup', level: 'error' },
     D442: { name: '调试挂件进了正式包', level: 'error' },
-    D443: { name: '界面硬编码文案', level: 'error' },
+    // warning：不阻断，界面文字尽量走 i18n，但不硬性要求（2026-11-08 放宽）
+    D443: { name: '界面硬编码文案', level: 'warning' },
     D444: { name: '界面直接显示错误原文', level: 'error' },
     D445: { name: '自建按词分割器', level: 'error' },
     D490: { name: '其他严格规则', level: 'error' },
+    // no-unnecessary-condition：一半是对的（必填的 prop 写 ?.()），一半是防运行环境（navigator.mediaDevices?.、import.meta.env?.），只提醒
+    D491: { name: '多余的条件判断', level: 'warning' },
 
     // 5xx：契约与持久化
     D506: { name: '@note 注释被改动', level: 'error' },
@@ -102,6 +105,26 @@ export const CODES = {
     D608: { name: '系统加密的可用性各自判断', level: 'error' },
     D609: { name: '外链绕过协议白名单', level: 'error' },
     D611: { name: '读取别的应用的凭据', level: 'error' },
+
+    // 8xx：Coven 流程（dev/coven/，由监控 session 调用的脚本报出）
+    // 80x：Aeolian 开 PR 前的阻断项（coven:verify、coven:pr）
+    D801: { name: '缺少契约或契约没批准', level: 'error' },
+    D802: { name: '契约项未通过', level: 'error' },
+    D803: { name: '越出契约范围', level: 'error' },
+    D804: { name: '契约被改写', level: 'error' },
+    D805: { name: '疑似提示注入', level: 'error' },
+    D806: { name: '重构未消减基线', level: 'error' },
+    D807: { name: '风险级被下调', level: 'error' },
+    // 81x：任务停下等人（blocked）
+    D810: { name: '重试耗尽', level: 'warning' },
+    D811: { name: '评审两轮未过', level: 'warning' },
+    D812: { name: '需要取舍', level: 'warning' },
+    D813: { name: '预算耗尽', level: 'warning' },
+    D820: { name: '外部代码未获准运行', level: 'error' },
+    // 83x：coven: 认领协议
+    D830: { name: '认领冲突', level: 'warning' },
+    D831: { name: '无效认领', level: 'notice' },
+    D832: { name: '租约过期', level: 'notice' },
 };
 
 /** ESLint 规则 id → 代码。没列出的规则统一报 D490 并附规则 id；消息以 `Dxxx` 开头的（项目约定规则）按消息里的代码。 */
@@ -111,6 +134,7 @@ export const ESLINT_RULE_CODES = {
     '@typescript-eslint/no-explicit-any': 'D403',
     '@typescript-eslint/switch-exhaustiveness-check': 'D404',
     '@typescript-eslint/consistent-type-imports': 'D405',
+    '@typescript-eslint/no-unnecessary-condition': 'D491',
     'react-hooks/rules-of-hooks': 'D406',
     'react-hooks/exhaustive-deps': 'D407',
     'dedicatus/no-icon-libraries': 'D412',
